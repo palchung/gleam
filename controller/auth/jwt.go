@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/twinj/uuid"
 	"github.com/go-redis/redis/v8"
 	"time"
