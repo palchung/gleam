@@ -1,1 +1,1 @@
-£ sample project
+A Trial project

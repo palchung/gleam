@@ -24,8 +24,12 @@ func InitRouter(client *redis.Client) *gin.Engine {
 	// serves static files
 	//r.StaticFS("/route". "../path/to/files")
 
+	//test
+	r.GET("/try", service.Try)
+
 	// serves public api
 	r.POST("/login", service.Login)
+	r.POST("/refresh", service.Refresh)
 
 	u := r.Group("user")
 	u.Use(middleware.TokenAuth())
