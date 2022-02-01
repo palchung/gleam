@@ -8,12 +8,12 @@ import(
 	"net/http"
 	"fmt"
 	"github.com/dgrijalva/jwt-go/v4"
-	
+	"strconv"
 )
 
 // for testing
 var user = model.User {
-	ID: 		"1",
+	ID: 		1,
 	Username:	"username",
 	Password:	"password",
 }
@@ -111,8 +111,8 @@ func (h *profileHandler) Refresh(c *gin.Context) {
 			c.JSON(http.StatusUnprocessableEntity, err)
 			return
 		}
-		userId, roleOk := claims["user_id"].(string)
-		if roleOk == false {
+		userId, roleOk := strconv.ParseInt(fmt.Sprintf("%.f", claims["user_id"]), 10, 64)
+		if roleOk != nil {
 			c.JSON(http.StatusUnprocessableEntity, "unauthorized")
 			return
 		}

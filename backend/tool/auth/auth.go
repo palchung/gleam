@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"time"
+	"strconv"
 )
 
 type AuthInterface interface {
-	CreateAuth(string, *TokenDetails) error
-	FetchAuth(string) (string, error)
+	CreateAuth(int64, *TokenDetails) error
+	FetchAuth(string) (int64, error)
 	DeleteRefresh(string) error
 	DeleteTokens(*AccessDetails) error
 }
@@ -29,7 +30,7 @@ func NewAuth(client *redis.Client) *service {
 
 type AccessDetails struct {
 	TokenUuid	string
-	UserId		string
+	UserId		int64
 }
 
 type TokenDetails struct {
@@ -42,16 +43,16 @@ type TokenDetails struct {
 }
 
 // Save token metadata to Redis
-func (tk *service) CreateAuth(userId string, td *TokenDetails) error {
+func (tk *service) CreateAuth(userId int64, td *TokenDetails) error {
 	at := time.Unix(td.AtExpires, 0) //converting Unix to UTC
 	rt := time.Unix(td.ReExpires, 0)
 	now := time.Now()
 
-	atCreated, err := tk.client.Set(ctx, td.TokenUuid, userId, at.Sub(now)).Result()
+	atCreated, err := tk.client.Set(ctx, td.TokenUuid, strconv.Itoa(int(userId)), at.Sub(now)).Result()
 	if err != nil {
 		return err
 	}
-	rtCreated, err := tk.client.Set(ctx, td.RefreshUuid, userId, rt.Sub(now)).Result()
+	rtCreated, err := tk.client.Set(ctx, td.RefreshUuid, strconv.Itoa(int(userId)), rt.Sub(now)).Result()
 	if err != nil {
 		return err
 	}
@@ -62,12 +63,13 @@ func (tk *service) CreateAuth(userId string, td *TokenDetails) error {
 }
 
 // Check the metadata saved
-func (tk *service) FetchAuth(tokenUuid string) (string, error) {
+func (tk *service) FetchAuth(tokenUuid string) (int64, error) {
 	userid, err := tk.client.Get(ctx, tokenUuid).Result()
 	if err != nil {
-		return "", err
+		return 0, err
 	}
-	return userid, nil
+	u, _ := strconv.ParseInt(userid, 10, 64)
+	return u, nil
 }
 
 func (tk *service) DeleteTokens(authD *AccessDetails) error {

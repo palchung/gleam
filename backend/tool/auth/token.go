@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 	"thefreepress/tool/setting"
+	"strconv"
 )
 
 type tokenservice struct {}
@@ -18,27 +19,28 @@ func NewToken() *tokenservice {
 }
 
 type TokenInterface interface {
-	CreateToken(userId string) (*TokenDetails, error)
+	CreateToken(userId int64) (*TokenDetails, error)
 	ExtractTokenMetadata(*http.Request) (*AccessDetails, error)
 }
 
 //token implement the TokenInterface
 var _ TokenInterface = &tokenservice{}
 
-func (t *tokenservice) CreateToken(userId string) (*TokenDetails, error) {
+func (t *tokenservice) CreateToken(userId int64) (*TokenDetails, error) {
 	td := &TokenDetails{}
 	td.AtExpires = time.Now().Add(time.Minute * 30).Unix() //expires after 30 mins
 	td.TokenUuid = uuid.NewV4().String()
 
 	td.ReExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
-	td.RefreshUuid = td.TokenUuid + "++" + userId
+	td.RefreshUuid = td.TokenUuid + "++" + strconv.Itoa(int(userId))
 	
 	var err error 
 	//Create Access Token
 	atClaims := jwt.MapClaims{}
-	atClaims["access_uuid"] = userId
+	atClaims["authorized"] = true
+	atClaims["access_uuid"] = td.TokenUuid
 	atClaims["user_id"] = userId
-	atClaims["exp["] = td.AtExpires
+	atClaims["exp"] = td.AtExpires
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	td.AccessToken, err = at.SignedString([]byte(setting.AppSetting.JWTAccessSecret))
 	if err != nil {
@@ -97,13 +99,13 @@ func extract(token *jwt.Token) (*AccessDetails, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if ok && token.Valid {
 		accessUuid, ok := claims["access_uuid"].(string)
-		userId, userOk := claims["user_id"].(string)
-		if ok == false || userOk == false {
+		userId, userOk := strconv.ParseInt(fmt.Sprintf("%.f", claims["user_id"]), 10, 64)
+		if ok == false || userOk != nil {
 			return nil, errors.New("unauthorized")
 		} else {
 			return &AccessDetails{
-				TokenUuid: accessUuid,
-				UserId: userId,
+				TokenUuid: 	accessUuid,
+				UserId: 	userId,
 			}, nil
 		}
 	}
