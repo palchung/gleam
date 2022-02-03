@@ -1,1 +1,1 @@
-A Trial project
+This is a app for leaarning purpose.

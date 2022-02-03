@@ -45,7 +45,11 @@ type Database struct {
 	User        string
 	Password    string
 	Host        string
-	Name        string
+	Port		string
+	DBname      string
+	MaxOpenDbConn int
+	MaxIdleDbConn int
+	MaxDbLifetime int
 	TablePrefix string
 }
 

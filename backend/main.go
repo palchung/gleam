@@ -14,24 +14,36 @@ import (
     "thefreepress/tool/logging"
     "thefreepress/routers"
 	"thefreepress/db/gredis"
+	"thefreepress/db"
+	
 
 )
 
 func init() {
     setting.Setup()
     logging.Setup()
-	
 }
 
 func main() {
     gin.SetMode(setting.ServerSetting.RunMode)
-	r := gredis.Setup()
-	routersInit := routers.InitRouter(r)
+
+	//connect to database
+	database := dbDriver.Setup()
+	defer database.SQL.Close()
+	log.Println("[INFO] Connected to Database")
+
+	//connect redis
+	redis := gredis.Setup()
+	log.Println("[INFO] Connected to redis")
+
+	// initialize routers
+	routersInit := routers.InitRouter(redis, database)
 	readTimeout := setting.ServerSetting.ReadTimeout
 	writeTimeout := setting.ServerSetting.WriteTimeout
 	endPoint := fmt.Sprintf(":%d", setting.ServerSetting.HttpPort)
 	maxHeaderBytes := 1 << 20
 
+	// Setup server
 	srv := &http.Server{
 		Addr:           endPoint,
 		Handler:        routersInit,
@@ -39,9 +51,9 @@ func main() {
 		WriteTimeout:   writeTimeout,
 		MaxHeaderBytes: maxHeaderBytes,
 	}
-
 	log.Printf("[INFO] start http server listening %s", endPoint)
 
+	// Startup server
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)
@@ -59,11 +71,6 @@ func main() {
 		log.Fatal("[ERROR] Server Shutdown:", err)
 	}
 	log.Println("[INFO] Server exiting")
-
-
-
-
-
 }
 
 

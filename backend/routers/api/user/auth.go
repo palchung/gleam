@@ -2,7 +2,6 @@ package user
 
 import(
 	"github.com/gin-gonic/gin"
-	"thefreepress/tool/auth"
 	"thefreepress/model"
 	"thefreepress/tool/setting"
 	"net/http"
@@ -19,17 +18,7 @@ var user = model.User {
 }
 
 
-
-type profileHandler struct {
-	rd	auth.AuthInterface
-	tk	auth.TokenInterface
-}
-
-func NewProfile(rd auth.AuthInterface, tk auth.TokenInterface) *profileHandler {
-	return &profileHandler{rd, tk}
-}
-
-func (p *profileHandler) Try(c *gin.Context) {
+func (h *profileHandler) Try(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "hello world"})	
 }
 

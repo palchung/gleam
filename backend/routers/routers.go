@@ -8,21 +8,26 @@ import (
 	"thefreepress/routers/api/user"
 	"thefreepress/tool/auth"
 	"thefreepress/middleware"
+	"thefreepress/db"
 )
 
-func InitRouter(client *redis.Client) *gin.Engine {
-	
-	var rd = auth.NewAuth(client)
-	var tk = auth.NewToken()
-	var service = user.NewProfile(rd, tk)
+
+
+func InitRouter(rc *redis.Client, db *dbDriver.DB) *gin.Engine {
 
 	// initialize gin
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
-
+	
 	// serves static files
 	//r.StaticFS("/route". "../path/to/files")
+	
+	
+
+	var rd = auth.NewAuth(rc)
+	var tk = auth.NewToken()
+	var service = user.NewProfile(rd, tk, db)
 
 	//test
 	r.GET("/try", service.Try)
