@@ -7,7 +7,6 @@ import (
 	"thefreepress/db"
 )
 
-
 type profileHandler struct {
 	rd	auth.AuthInterface
 	tk	auth.TokenInterface

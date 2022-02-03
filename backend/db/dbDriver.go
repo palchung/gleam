@@ -12,7 +12,6 @@ import (
 	_ "github.com/jackc/pgx/v4"
 )
 
-
 type DB struct {
 	SQL *sql.DB
 }
@@ -22,7 +21,7 @@ var dbConn = &DB{}
 func Setup() *DB{
 
 	// Connect PostgreSql
-	d, err := NewDatabase(gpostgres.Host())
+	d, err := NewDatabase(gpostgres.Dsn())
 	if err != nil {
 		panic(err)
 	}

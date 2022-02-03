@@ -10,7 +10,6 @@ type Todo struct {
 	Title 	string	`json:"title"`	
 }
 
-
 func (h *profileHandler) CreateTodo(c *gin.Context) {
 	var td Todo
 	if err := c.ShouldBindJSON(&td); err != nil {

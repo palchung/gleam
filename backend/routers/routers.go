@@ -11,8 +11,6 @@ import (
 	"thefreepress/db"
 )
 
-
-
 func InitRouter(rc *redis.Client, db *dbDriver.DB) *gin.Engine {
 
 	// initialize gin
@@ -23,8 +21,6 @@ func InitRouter(rc *redis.Client, db *dbDriver.DB) *gin.Engine {
 	// serves static files
 	//r.StaticFS("/route". "../path/to/files")
 	
-	
-
 	var rd = auth.NewAuth(rc)
 	var tk = auth.NewToken()
 	var service = user.NewProfile(rd, tk, db)
