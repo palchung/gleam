@@ -38,6 +38,7 @@ func Setup(rc *redis.Client, db *dbDriver.DB) *gin.Engine {
 	u := r.Group("user")
 	u.Use(middleware.TokenAuth())
 	{
+		u.POST("/logout", service.Logout)
 		u.POST("/todo", service.CreateTodo)
 	}
 

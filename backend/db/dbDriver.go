@@ -32,7 +32,7 @@ func Setup() *DB{
 	dbConn.SQL = d
 	err = testDB(d)
 	if err != nil {
-		log.Fatal("Cannot connect to database")
+		log.Fatal("Cannot connect to database: ", err)
 	}
 
 	return dbConn
