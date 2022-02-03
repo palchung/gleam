@@ -37,7 +37,7 @@ func main() {
 	log.Println("[INFO] Connected to redis")
 
 	// initialize routers
-	routersInit := routers.InitRouter(redis, database)
+	routersInit := routers.Setup(redis, database)
 	readTimeout := setting.ServerSetting.ReadTimeout
 	writeTimeout := setting.ServerSetting.WriteTimeout
 	endPoint := fmt.Sprintf(":%d", setting.ServerSetting.HttpPort)
