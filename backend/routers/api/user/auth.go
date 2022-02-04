@@ -17,7 +17,6 @@ var user = model.User {
 	Password:	"password",
 }
 
-
 func (h *profileHandler) Try(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "hello world"})	
 }
@@ -61,9 +60,6 @@ func (h *profileHandler) Logout(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, "Successfully Logged out")
 }
-
-
-
 
 
 func (h *profileHandler) Refresh(c *gin.Context) {
