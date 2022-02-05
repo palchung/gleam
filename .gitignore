@@ -16,5 +16,5 @@
 .vscode
 runtime
 pkg
-*.sh
+push.sh
 
