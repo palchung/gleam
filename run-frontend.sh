@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cd ~/thefreepress/frontend
-flutter run -d web-server --web-hostname=0.0.0.0 --web-port=8081
+flutter run -d web-server --web-hostname=0.0.0.0 --web-port=8000

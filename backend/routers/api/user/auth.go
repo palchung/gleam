@@ -24,7 +24,7 @@ func (h *profileHandler) Try(c *gin.Context) {
 func (h *profileHandler) Login(c *gin.Context) {
 	var u model.User
 	if err := c.ShouldBindJSON(&u); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, "Invlid json provided")
+		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
 		return
 	}
 	// compare user from database
