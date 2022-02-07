@@ -17,11 +17,13 @@ var user = model.User {
 	Password:	"password",
 }
 
-func (h *profileHandler) Try(c *gin.Context) {
+
+
+func (p *profileHandler) Try(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "hello world"})	
 }
 
-func (h *profileHandler) Login(c *gin.Context) {
+func (p *profileHandler) Login(c *gin.Context) {
 	var u model.User
 	if err := c.ShouldBindJSON(&u); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
@@ -32,12 +34,12 @@ func (h *profileHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, "Wrong login details")
 		return
 	}
-	ts, err := h.tk.CreateToken(user.ID)
+	ts, err := p.tk.CreateToken(user.ID)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
-	saveErr := h.rd.CreateAuth(user.ID, ts)
+	saveErr := p.rd.CreateAuth(user.ID, ts)
 	if saveErr != nil {
 		c.JSON(http.StatusUnprocessableEntity, saveErr.Error())
 		return
@@ -49,11 +51,11 @@ func (h *profileHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, tokens)
 }
 
-func (h *profileHandler) Logout(c *gin.Context) {
+func (p *profileHandler) Logout(c *gin.Context) {
 	//if metadata is passed and the token valid, delete them from the redis store
-	metadata, _ := h.tk.ExtractTokenMetadata(c.Request)
+	metadata, _ := p.tk.ExtractTokenMetadata(c.Request)
 	if metadata != nil {
-		deleteErr := h.rd.DeleteTokens(metadata)
+		deleteErr := p.rd.DeleteTokens(metadata)
 		if deleteErr != nil {
 			c.JSON(http.StatusBadRequest, deleteErr.Error())
 		}
@@ -62,7 +64,7 @@ func (h *profileHandler) Logout(c *gin.Context) {
 }
 
 
-func (h *profileHandler) Refresh(c *gin.Context) {
+func (p *profileHandler) Refresh(c *gin.Context) {
 	mapToken :=map[string]string{}
 	if err := c.ShouldBindJSON(&mapToken); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
@@ -102,19 +104,19 @@ func (h *profileHandler) Refresh(c *gin.Context) {
 			return
 		}
 		//Delete the previous Refresh Token
-		delErr := h.rd.DeleteRefresh(refreshUuid)
+		delErr := p.rd.DeleteRefresh(refreshUuid)
 		if delErr != nil { // if any goes wrong
 			c.JSON(http.StatusUnauthorized, "unauthorized")
 			return
 		}
 		//Create new pairs of refresh and access token
-		ts, createErr := h.tk.CreateToken(userId)
+		ts, createErr := p.tk.CreateToken(userId)
 		if createErr != nil {
 			c.JSON(http.StatusForbidden, createErr.Error())
 			return
 		}
 		//save tokens metadata to redis
-		saveErr :=h.rd.CreateAuth(userId, ts)
+		saveErr :=p.rd.CreateAuth(userId, ts)
 		if saveErr != nil {
 			c.JSON(http.StatusForbidden, saveErr.Error())
 			return

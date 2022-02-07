@@ -21,7 +21,7 @@ func Setup(rc *redis.Client, db *dbDriver.DB) *gin.Engine {
 	// serves static files
 	//r.StaticFS("/route". "../path/to/files")
 	
-	//setup JWT
+	//setup JWT methods
 	var rd = auth.NewAuth(rc)
 	var tk = auth.NewToken()
 	

@@ -17,20 +17,17 @@ type DB struct {
 }
 
 var dbConn = &DB{}
+var err error
 
 func Setup() *DB{
 
 	// Connect PostgreSql
-	d, err := NewDatabase(gpostgres.Dsn())
+	dbConn.SQL, err = NewDatabase(gpostgres.Dsn())
 	if err != nil {
 		panic(err)
 	}
-	d.SetMaxOpenConns(setting.DatabaseSetting.MaxOpenDbConn)
-	d.SetMaxIdleConns(setting.DatabaseSetting.MaxIdleDbConn)
-	d.SetConnMaxLifetime(time.Duration(setting.DatabaseSetting.MaxDbLifetime) * time.Minute)
 
-	dbConn.SQL = d
-	err = testDB(d)
+	err = testDB(dbConn.SQL)
 	if err != nil {
 		log.Fatal("Cannot connect to database: ", err)
 	}
@@ -53,5 +50,9 @@ func NewDatabase(dsn string) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	db.SetMaxOpenConns(setting.DatabaseSetting.MaxOpenDbConn)
+	db.SetMaxIdleConns(setting.DatabaseSetting.MaxIdleDbConn)
+	db.SetConnMaxLifetime(time.Duration(setting.DatabaseSetting.MaxDbLifetime) * time.Minute)
+
 	return db, nil
 }

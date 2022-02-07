@@ -1,34 +1,27 @@
 package user
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Todo struct {
-	UserID 	int64 	`json:"user_id"`
-	Title 	string	`json:"title"`	
+	UserID int64  `json:"user_id"`
 }
 
-func (h *profileHandler) CreateTodo(c *gin.Context) {
+func (p *profileHandler) CreateTodo(c *gin.Context) {
 	var td Todo
 	if err := c.ShouldBindJSON(&td); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, "invlid json")
+		c.JSON(http.StatusUnprocessableEntity, "invalid json")
 		return
 	}
-	metadata, err := h.tk.ExtractTokenMetadata(c.Request)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, "unauthorized")
-		return
-	}
-	userId, err := h.rd.FetchAuth(metadata.TokenUuid)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, "unauthorized")
-		return
-	}
+
+	userId := GetUserIdByToken(p, c)
 	td.UserID = userId
 
 	// save data into database
+	testdata := p.db.AllUsers()
 
-	c.JSON(http.StatusCreated, td)
+	c.JSON(http.StatusCreated, testdata)
 }

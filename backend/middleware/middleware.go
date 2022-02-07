@@ -1,11 +1,13 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
-	"thefreepress/tool/auth"
 	"net/http"
+	"thefreepress/tool/auth"
+
+	"github.com/gin-gonic/gin"
 )
 
+//check if the token is still valid
 func TokenAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		err := auth.TokenValid(c.Request)
