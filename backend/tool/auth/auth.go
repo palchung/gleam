@@ -1,12 +1,13 @@
 package auth
 
 import (
-	"errors"
 	"context"
+	"errors"
 	"fmt"
-	"github.com/go-redis/redis/v8"
-	"time"
 	"strconv"
+	"time"
+
+	"github.com/go-redis/redis/v8"
 )
 
 type AuthInterface interface {
@@ -29,17 +30,17 @@ func NewAuth(client *redis.Client) *service {
 }
 
 type AccessDetails struct {
-	TokenUuid	string
-	UserId		int64
+	TokenUuid string
+	UserId    int64
 }
 
 type TokenDetails struct {
-	AccessToken		string
-	RefreshToken	string
-	TokenUuid		string
-	RefreshUuid		string
-	AtExpires		int64
-	ReExpires		int64
+	AccessToken  string
+	RefreshToken string
+	TokenUuid    string
+	RefreshUuid  string
+	AtExpires    int64
+	ReExpires    int64
 }
 
 // Save token metadata to Redis
@@ -73,8 +74,9 @@ func (tk *service) FetchAuth(tokenUuid string) (int64, error) {
 }
 
 func (tk *service) DeleteTokens(authD *AccessDetails) error {
+	uid := strconv.FormatInt(authD.UserId, 10)
 	// get the refresh uuid
-	refreshUuid := fmt.Sprintf("%s++%s", authD.TokenUuid, authD.UserId)
+	refreshUuid := fmt.Sprintf("%s++%s", authD.TokenUuid, uid)
 	// delete access token
 	deleteAt, err := tk.client.Del(ctx, authD.TokenUuid).Result()
 	if err != nil {

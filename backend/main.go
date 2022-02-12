@@ -1,31 +1,30 @@
 package main
 
 import (
-    "fmt"
-    "log"
-    "net/http"
+	"context"
+	"fmt"
+	"log"
+	"net/http"
 	"os"
 	"os/signal"
-	"context"
 	"time"
 
-    "github.com/gin-gonic/gin"    
-    "thefreepress/tool/setting"
-    "thefreepress/tool/logging"
-    "thefreepress/routers"
+	dbDriver "thefreepress/db"
 	"thefreepress/db/gredis"
-	"thefreepress/db"
-	
+	"thefreepress/routers"
+	"thefreepress/tool/logging"
+	"thefreepress/tool/setting"
 
+	"github.com/gin-gonic/gin"
 )
 
 func init() {
-    setting.Setup()
-    logging.Setup()
+	setting.Setup()
+	logging.Setup()
 }
 
 func main() {
-    gin.SetMode(setting.ServerSetting.RunMode)
+	gin.SetMode(setting.ServerSetting.RunMode)
 
 	//connect to database
 	database := dbDriver.Setup()
@@ -65,15 +64,10 @@ func main() {
 	<-quit
 	log.Println("[INFO] Shutdown Server ...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal("[ERROR] Server Shutdown:", err)
 	}
 	log.Println("[INFO] Server exiting")
 }
-
-
-
-
-

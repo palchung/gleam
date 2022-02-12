@@ -8,10 +8,10 @@ import (
 )
 
 type App struct {
-	JWTAccessSecret string
+	JWTAccessSecret  string
 	JWTRefreshSecret string
-	PageSize  int
-	PrefixUrl string
+	PageSize         int
+	PrefixUrl        string
 
 	RuntimeRootPath string
 
@@ -41,16 +41,16 @@ type Server struct {
 var ServerSetting = &Server{}
 
 type Database struct {
-	Type        string
-	User        string
-	Password    string
-	Host        string
-	Port		string
-	DBname      string
+	Type          string
+	User          string
+	Password      string
+	Host          string
+	Port          string
+	DBname        string
 	MaxOpenDbConn int
 	MaxIdleDbConn int
 	MaxDbLifetime int
-	TablePrefix string
+	TablePrefix   string
 }
 
 var DatabaseSetting = &Database{}
