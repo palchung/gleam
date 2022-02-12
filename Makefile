@@ -1,7 +1,6 @@
 ll: 
 	make -B backend | make -B frontend
 
-
 # flutter commands
 
 frontend:

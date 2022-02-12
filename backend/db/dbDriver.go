@@ -2,14 +2,14 @@ package dbDriver
 
 import (
 	"database/sql"
-	"thefreepress/tool/setting"
-	"time"
 	"log"
 	"thefreepress/db/gpostgres"
-	
+	"thefreepress/tool/setting"
+	"time"
+
 	_ "github.com/jackc/pgconn"
-	_ "github.com/jackc/pgx/v4/stdlib"
 	_ "github.com/jackc/pgx/v4"
+	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 type DB struct {
@@ -19,7 +19,7 @@ type DB struct {
 var dbConn = &DB{}
 var err error
 
-func Setup() *DB{
+func Setup() *DB {
 
 	// Connect PostgreSql
 	dbConn.SQL, err = NewDatabase(gpostgres.Dsn())

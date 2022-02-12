@@ -10,7 +10,7 @@ type postgresDBRepo struct {
 }
 
 func NewPostgresRepo(conn *sql.DB) repository.DatabaseInterface {
-	return &postgresDBRepo {
+	return &postgresDBRepo{
 		DB: conn,
-	}	
+	}
 }

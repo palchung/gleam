@@ -1,8 +1,8 @@
 package gpostgres
 
 import (
-	"thefreepress/tool/setting"
 	"fmt"
+	"thefreepress/tool/setting"
 )
 
 func Dsn() string {
@@ -14,5 +14,5 @@ func Dsn() string {
 	dbname := setting.DatabaseSetting.DBname
 	s := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s", host, port, dbname, user, password)
 
-	return s	
+	return s
 }

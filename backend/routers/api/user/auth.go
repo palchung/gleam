@@ -1,26 +1,25 @@
 package user
 
-import(
-	"github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"net/http"
+	"strconv"
 	"thefreepress/model"
 	"thefreepress/tool/setting"
-	"net/http"
-	"fmt"
+
 	"github.com/dgrijalva/jwt-go/v4"
-	"strconv"
+	"github.com/gin-gonic/gin"
 )
 
 // for testing
-var user = model.User {
-	ID: 		1,
-	Username:	"username",
-	Password:	"password",
+var user = model.User{
+	ID:       1,
+	Username: "username",
+	Password: "password",
 }
 
-
-
 func (p *profileHandler) Try(c *gin.Context) {
-	c.JSON(200, gin.H{"message": "hello world"})	
+	c.JSON(200, gin.H{"message": "hello world"})
 }
 
 func (p *profileHandler) Login(c *gin.Context) {
@@ -44,9 +43,9 @@ func (p *profileHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, saveErr.Error())
 		return
 	}
-	tokens := map[string]string {
-		"access_token": 	ts.AccessToken,
-		"refresh_token":	ts.RefreshToken,
+	tokens := map[string]string{
+		"access_token":  ts.AccessToken,
+		"refresh_token": ts.RefreshToken,
 	}
 	c.JSON(http.StatusOK, tokens)
 }
@@ -63,9 +62,8 @@ func (p *profileHandler) Logout(c *gin.Context) {
 	c.JSON(http.StatusOK, "Successfully Logged out")
 }
 
-
 func (p *profileHandler) Refresh(c *gin.Context) {
-	mapToken :=map[string]string{}
+	mapToken := map[string]string{}
 	if err := c.ShouldBindJSON(&mapToken); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
@@ -73,7 +71,7 @@ func (p *profileHandler) Refresh(c *gin.Context) {
 	refreshToken := mapToken["refresh_token"]
 
 	//verify the token
-	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error){
+	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected siging method: %v", token.Header["alg"])
 		}
@@ -85,14 +83,14 @@ func (p *profileHandler) Refresh(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, "Refresh token expired")
 		return
 	}
-	// is token valid ? 
+	// is token valid ?
 	if _, ok := token.Claims.(jwt.Claims); !ok && !token.Valid {
 		c.JSON(http.StatusUnauthorized, err)
 		return
 	}
 	//Since token is valid, get the uuid
 	claims, ok := token.Claims.(jwt.MapClaims) // token claims should conform to the MapClaims
-	if ok && token.Valid{
+	if ok && token.Valid {
 		refreshUuid, ok := claims["refresh_uuid"].(string) // convert the interface into string
 		if !ok {
 			c.JSON(http.StatusUnprocessableEntity, err)
@@ -116,13 +114,13 @@ func (p *profileHandler) Refresh(c *gin.Context) {
 			return
 		}
 		//save tokens metadata to redis
-		saveErr :=p.rd.CreateAuth(userId, ts)
+		saveErr := p.rd.CreateAuth(userId, ts)
 		if saveErr != nil {
 			c.JSON(http.StatusForbidden, saveErr.Error())
 			return
 		}
-		tokens := map[string]string {
-			"access_token": ts.AccessToken,
+		tokens := map[string]string{
+			"access_token":  ts.AccessToken,
 			"refresh_token": ts.RefreshToken,
 		}
 		c.JSON(http.StatusCreated, tokens)
