@@ -5,7 +5,7 @@ ll:
 
 frontend:
 	cd frontend ; \
-	flutter run -d web-server --web-hostname=0.0.0.0 --web-port=8000
+	npm start
 
 
 # Golang commands
