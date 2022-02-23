@@ -1,21 +1,18 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import AppPages from './routers/AppPages';
 
-import Header from './components/Header';
-import './App.css';
+import Layout from './components/Layout';
+import AppPages from './routers/AppPages';
 
 
 function App() {
   return (
     <Router>
     <div className="App">
-      
-      <Header />
-      
-      <div className="container">
+            
+      <Layout>
         <AppPages />
-      </div>
+      </Layout>
 
     </div>
     </Router>

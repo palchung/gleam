@@ -14,18 +14,18 @@ function getNavItems() {
   return Object.values(n);
 };
 
-const navItems = getNavItems();
+const Menu = getNavItems();
 
-function Header() {
-  return <ul className='App-nav-list'>
-    {
-      navItems.map((navItem, i) => (
-        <li key={i} className="App-nav-item">
-            <Link to={navItem.path}>{navItem.name}</Link>
-        </li>
-      ))
-    }
-  </ul>
-}
+// function Header() {
+//   return <ul className='App-nav-list'>
+//     {
+//       navItems.map((navItem, i) => (
+//         <li key={i} className="App-nav-item">
+//             <Link to={navItem.path}>{navItem.name}</Link>
+//         </li>
+//       ))
+//     }
+//   </ul>
+// }
 
-export default Header;
+export default Menu;
