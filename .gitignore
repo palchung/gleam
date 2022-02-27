@@ -16,6 +16,7 @@
 .vscode
 runtime
 pkg/*
+pkg/mod/*
 pkg
 push.sh
 golang/build/*
