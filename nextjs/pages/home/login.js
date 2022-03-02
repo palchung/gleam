@@ -1,12 +1,20 @@
 import React from 'react'
+import LoginForm from '../../src/components/modules/loginFrom'
+import { Box } from '@mui/material'
 
+function Login() {
 
-export default function Login() {
     return (
-        <div>
-            this is login page
-        </div>
+        <Box
+            sx={{
+                my: 4,
+                backgroundColor: 'secondary.light',
+            }}
+        >
+            <LoginForm />
+        </Box>
     )
 }
 
-Login.layout = 'Default'
+// Signup.layout = "Fullpage"
+export default Login

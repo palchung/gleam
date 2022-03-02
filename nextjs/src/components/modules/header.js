@@ -4,10 +4,15 @@ import { IconButton } from '@mui/material'
 import { Badge } from '@mui/material'
 import { Toolbar } from '@mui/material'
 import Link from 'next/link';
+import { useContext } from 'react'
+import AuthContext from '../../api/auth/authContext'
 
 import { appBarItems } from '../../router/routes'
 
 export default function Header() {
+
+    const { logout, user } = useContext(AuthContext)
+
     return (
 
         <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} >
@@ -19,11 +24,19 @@ export default function Header() {
                 <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                     {appBarItems.map((navItem, i) => (
                         <Link href={navItem.path} key={i}>
-                            <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+                            <IconButton size="large" color="inherit">
                                 {navItem.icon}
                             </IconButton>
                         </Link>
                     ))}
+                    {user ? <>
+                        <Link href="/">
+                            <a>Dashboard</a>
+                        </Link>
+                        <div>
+                            <a onClick={() => logout()}>Logout</a>
+                        </div>
+                    </> : null}
                 </Box>
             </Toolbar>
         </AppBar>

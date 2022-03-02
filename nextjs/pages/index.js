@@ -2,9 +2,7 @@ import * as React from 'react';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import ProTip from '../src/ProTip';
-import Link from '../src/Link';
-import Copyright from '../app/components/modules/Copyright';
+import Link from '../src/helper/Link';
 
 export default function Index() {
   return (
@@ -16,8 +14,6 @@ export default function Index() {
         <Link href="/about" color="secondary">
           Go to the about page
         </Link>
-        <ProTip />
-        <Copyright />
       </Box>
     </Container>
   );

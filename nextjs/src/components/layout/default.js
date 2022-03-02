@@ -1,12 +1,7 @@
 import React from 'react'
-import { appBarItems } from '../../router/routes'
-import Link from '../../../src/Link'
 import Box from '@mui/material/Box'
-import { Container, Drawer, Toolbar, Typography } from '@mui/material'
-import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material'
+import { Container } from '@mui/material'
 import Header from '../modules/header'
-
-const drawerWidth = 240
 
 const Default = ({ children }) => {
     return (
