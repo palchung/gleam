@@ -19,6 +19,7 @@
     "@mui/material": "latest",
     "cookie": "^0.4.2",
     "next": "latest",
+    "node-fetch": "^3.2.1",
     "prop-types": "latest",
     "react": "latest",
     "react-dom": "latest",

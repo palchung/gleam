@@ -32,9 +32,10 @@ func Setup(rc *redis.Client, db *dbDriver.DB) *gin.Engine {
 	r.GET("/try", service.Try)
 
 	// serves public api
+	r.POST("/signup", service.Signup)
 	r.POST("/login", service.Login)
 	r.POST("/refresh", service.Refresh)
-
+	
 	u := r.Group("user")
 	u.Use(middleware.TokenAuth())
 	{

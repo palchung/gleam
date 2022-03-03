@@ -1,5 +1,5 @@
 import React from 'react'
-import LoginForm from '../../src/components/modules/loginFrom'
+import LoginForm from '../../src/components/modules/loginForm'
 import { Box } from '@mui/material'
 
 function Login() {

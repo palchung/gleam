@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"root/gleam/golang/model"
 	"root/gleam/golang/tool/setting"
-
+	// "root/gleam/golang/tool/password"
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/gin-gonic/gin"
 )
@@ -14,13 +14,46 @@ import (
 // for testing
 var user = model.User{
 	ID:       1,
-	Username: "username",
+	FirstName: "username",
+	LastName: "username",
 	Password: "password",
 }
 
 func (p *profileHandler) Try(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "hello world"})
 }
+
+// context: firstName, lastName, email, password
+func (p *profileHandler) Signup(c *gin.Context){
+	var u model.User
+	if err := c.ShouldBindJSON(&u); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
+		return
+	}
+	// hashedPwd := password.HashAndSalt(u.Password)
+	// save user into database
+	// return user id
+	var userID int64
+	userID = 1 
+
+	ts, err := p.tk.CreateToken(userID)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+	saveErr := p.rd.CreateAuth(userID, ts)
+	if saveErr != nil {
+		c.JSON(http.StatusUnprocessableEntity, saveErr.Error())
+		return
+	}
+	tokens := map[string]string{
+		"access_token":  ts.AccessToken,
+		"refresh_token": ts.RefreshToken,
+	}
+	c.JSON(http.StatusOK, tokens)
+}
+
+
 
 func (p *profileHandler) Login(c *gin.Context) {
 	var u model.User
@@ -29,7 +62,7 @@ func (p *profileHandler) Login(c *gin.Context) {
 		return
 	}
 	// compare user from database
-	if user.Username != u.Username || user.Password != u.Password {
+	if user.FirstName != u.FirstName || user.Password != u.Password {
 		c.JSON(http.StatusUnauthorized, "Wrong login details")
 		return
 	}
