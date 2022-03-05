@@ -6,18 +6,11 @@ import (
 	"strconv"
 	"root/gleam/golang/model"
 	"root/gleam/golang/tool/setting"
-	// "root/gleam/golang/tool/password"
+	"root/gleam/golang/tool/password"
+	"root/gleam/golang/tool/logging"
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/gin-gonic/gin"
 )
-
-// for testing
-var user = model.User{
-	ID:       1,
-	FirstName: "username",
-	LastName: "username",
-	Password: "password",
-}
 
 func (p *profileHandler) Try(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "hello world"})
@@ -30,12 +23,18 @@ func (p *profileHandler) Signup(c *gin.Context){
 		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
 		return
 	}
-	// hashedPwd := password.HashAndSalt(u.Password)
+	
+	hashedPwd := password.HashAndSalt(u.Password)
+	
 	// save user into database
 	// return user id
-	var userID int64
-	userID = 1 
-
+	userID,errDB := p.db.SaveNewUser(u, hashedPwd)
+	if errDB != nil {
+		logging.Error("cant save new user")
+		c.JSON(http.StatusUnprocessableEntity, "Internal error")
+		return
+	}
+	
 	ts, err := p.tk.CreateToken(userID)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
@@ -49,7 +48,9 @@ func (p *profileHandler) Signup(c *gin.Context){
 	tokens := map[string]string{
 		"access_token":  ts.AccessToken,
 		"refresh_token": ts.RefreshToken,
-	}
+		"userID": strconv.FormatInt(userID, 10),
+	}	
+	c.SetCookie("refresh_token", ts.RefreshToken, 60*60*60, "/", setting.AppSetting.PrefixUrl, true, true)
 	c.JSON(http.StatusOK, tokens)
 }
 
@@ -62,16 +63,17 @@ func (p *profileHandler) Login(c *gin.Context) {
 		return
 	}
 	// compare user from database
-	if user.FirstName != u.FirstName || user.Password != u.Password {
-		c.JSON(http.StatusUnauthorized, "Wrong login details")
-		return
-	}
-	ts, err := p.tk.CreateToken(user.ID)
+	// if user.FirstName != u.FirstName || user.Password != u.Password {
+	// 	c.JSON(http.StatusUnauthorized, "Wrong login details")
+	// 	return
+	// }
+	var userID int64
+	ts, err := p.tk.CreateToken(userID)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
-	saveErr := p.rd.CreateAuth(user.ID, ts)
+	saveErr := p.rd.CreateAuth(userID, ts)
 	if saveErr != nil {
 		c.JSON(http.StatusUnprocessableEntity, saveErr.Error())
 		return

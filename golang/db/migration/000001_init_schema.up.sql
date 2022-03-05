@@ -1,6 +1,9 @@
 CREATE TABLE users (
-  id integer primary key,
-  username    varchar(40),
-  password varchar(40),
-  email   varchar(40)
+  id            integer primary key,
+  firstName     varchar(255) NOT NULL,
+  lastName      varchar(355) NOT NULL,
+  password      varchar(355) NOT NULL,
+  email         varchar(255) UNIQUE NOT NULL,
+  createdAt     timestamptz NOT NULL,
+  updatedAt     timestamptz NOT NULL
 );

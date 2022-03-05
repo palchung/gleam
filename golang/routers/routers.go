@@ -17,6 +17,7 @@ func Setup(rc *redis.Client, db *dbDriver.DB) *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+	r.Use(middleware.CORS())
 	
 	// serves static files
 	//r.StaticFS("/route". "../path/to/files")
@@ -29,7 +30,8 @@ func Setup(rc *redis.Client, db *dbDriver.DB) *gin.Engine {
 	var service = user.NewProfile(rd, tk, db)
 
 	//test
-	r.GET("/try", service.Try)
+	r.POST("/try", service.Try)
+	// r.OPTIONS("/try", service.Try)
 
 	// serves public api
 	r.POST("/signup", service.Signup)

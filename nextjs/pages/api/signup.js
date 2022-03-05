@@ -2,7 +2,7 @@ import { API_URL, COOKIE_SECURE } from "../../src/config/appConfig"
 import cookie from 'cookie'
 
 const signup = async (req, res) => {
-    
+
     if (req.method === 'POST') {
 
         const { firstName, lastName, email, password } = req.body
@@ -22,7 +22,7 @@ const signup = async (req, res) => {
 
         const resData = await apiRes.json()
 
-        console.log(resData.data)
+        console.log(resData)
 
         // if (apiRes.ok) {
         //     // Set Cookie

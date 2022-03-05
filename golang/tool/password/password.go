@@ -14,7 +14,7 @@ func HashAndSalt(pwd string) string{
 	return string(hash)
 }
 
-func verifyPasswords(hashedPwd, currentPwd string) bool {
+func Verify(hashedPwd, currentPwd string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPwd),[]byte(currentPwd))
 	if err != nil {
 		logging.Error(err)

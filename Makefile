@@ -51,10 +51,10 @@ Migration_file_path := db/migration
 PostgreSQL_address := postgres://$(SQL_User_name):$(SQL_Password)@$(SQL_Host):$(SQL_Port)/$(SQL_Database)?sslmode=$(SQL_SSL_mode)
 
 migrate-up:	
-	cd backend ; \
+	cd golang ; \
 	migrate -path $(Migration_file_path) -database $(PostgreSQL_address) -verbose up
 
 migrate-down:
-	cd backend ; \
+	cd golang ; \
 	migrate -path $(Migration_file_path) -database $(PostgreSQL_address) -verbose down
 

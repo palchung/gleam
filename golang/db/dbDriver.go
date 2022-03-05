@@ -25,6 +25,7 @@ func Setup() *DB {
 	dbConn.SQL, err = NewDatabase(gpostgres.Dsn())
 	if err != nil {
 		panic(err)
+		
 	}
 
 	err = testDB(dbConn.SQL)
