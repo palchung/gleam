@@ -8,6 +8,7 @@ import { useContext } from 'react'
 import AuthContext from '../../api/auth/authContext'
 
 import { appBarItems } from '../../router/routes'
+import LogoutIcon from '@mui/icons-material/Logout'
 
 export default function Header() {
 
@@ -30,11 +31,10 @@ export default function Header() {
                         </Link>
                     ))}
                     {user ? <>
-                        <Link href="/">
-                            <a>Dashboard</a>
-                        </Link>
                         <div>
-                            <a onClick={() => logout()}>Logout</a>
+                            <IconButton onClick={() => logout()} size="large" color="inherit">
+                                <LogoutIcon />
+                            </IconButton>
                         </div>
                     </> : null}
                 </Box>

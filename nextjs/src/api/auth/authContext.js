@@ -17,6 +17,16 @@ export const AuthProvider = ({ children }) => {
 
     // useEffect(() => checkedUserLoggedIn(), [])
 
+
+    const authHeader = async () => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user === null && !accessToken === null) {
+            return { Authorization: 'Bearer ' + accessToken };
+        } else {
+            return {};
+        }
+    }
+
     //Sign Up user
     const signup = async ({ firstName, lastName, email, password }) => {
 
@@ -27,13 +37,9 @@ export const AuthProvider = ({ children }) => {
             password: password
         })
             .then((response) => {
-
-                console.log('access token: ' + response.data.access_token)
                 setAccessToken(response.data.access_token)
-                console.log(response.data)
-
-                // setUser(null)
-                // router.push('/')
+                setUser(response.data.userID)
+                router.push('/')
             }, (error) => {
                 console.log(error)
                 setError(error)
@@ -43,56 +49,22 @@ export const AuthProvider = ({ children }) => {
     }
 
 
-    // const signup = async ({ firstName, lastName, email, password }) => {
-
-    //     const fetcher = (...args) => fetch(...args).then(res => res.json())
-
-    //     const res = await fetch(`/api/signup`, {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //         },
-    //         body: JSON.stringify({
-    //             firstName,
-    //             lastName,
-    //             email,
-    //             password
-    //         })
-    //     })
-
-    //     const resData = await res.json()
-
-    //     if (res.ok) {
-    //         setUser(resData.user)
-    //         router.push('/')
-    //     } else {
-    //         setError(resData.message)
-    //         setError(null)
-    //     }
-    // }
-
     //Login user
     const login = async ({ email, password }) => {
 
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email,
-                password
-            })
+        await axios.post(`${API_URL}/login`, {
+            email: email,
+            password: password
         })
-        const data = await res.json()
-
-        if (res.ok) {
-            setUser(data.user)
-            router.push('/')
-        } else {
-            setError(data.message)
-            setError(null)
-        }
+            .then((response) => {
+                setAccessToken(response.data.access_token)
+                setUser(response.data.userID)
+                router.push('/')
+            }, (error) => {
+                console.log(error)
+                setError(error)
+                setError(null)
+            })
     }
 
     //Logout

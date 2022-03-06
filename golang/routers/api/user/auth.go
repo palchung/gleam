@@ -30,8 +30,13 @@ func (p *profileHandler) Signup(c *gin.Context){
 	// return user id
 	userID,errDB := p.db.SaveNewUser(u, hashedPwd)
 	if errDB != nil {
-		logging.Error("cant save new user")
-		c.JSON(http.StatusUnprocessableEntity, "Internal error")
+		var errorMsg string
+		if errDB.Code == "23505" {
+			errorMsg = "User Account Exist"
+    	} else {
+			errorMsg = "Internal Error"
+		}
+		c.JSON(http.StatusUnprocessableEntity, errorMsg)
 		return
 	}
 	
@@ -45,13 +50,12 @@ func (p *profileHandler) Signup(c *gin.Context){
 		c.JSON(http.StatusUnprocessableEntity, saveErr.Error())
 		return
 	}
-	tokens := map[string]string{
+	res := map[string]string{
 		"access_token":  ts.AccessToken,
-		"refresh_token": ts.RefreshToken,
 		"userID": strconv.FormatInt(userID, 10),
 	}	
 	c.SetCookie("refresh_token", ts.RefreshToken, 60*60*60, "/", setting.AppSetting.PrefixUrl, true, true)
-	c.JSON(http.StatusOK, tokens)
+	c.JSON(http.StatusOK, res)
 }
 
 
@@ -62,12 +66,19 @@ func (p *profileHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
 		return
 	}
-	// compare user from database
-	// if user.FirstName != u.FirstName || user.Password != u.Password {
-	// 	c.JSON(http.StatusUnauthorized, "Wrong login details")
-	// 	return
-	// }
-	var userID int64
+	
+	userID, userPwd, errDB := p.db.GetUserPwdByEmail(u.Email)
+	if errDB != nil {
+		c.JSON(http.StatusUnauthorized, "We can't log you in")
+		return
+	}
+
+	verify := password.Verify(userPwd, u.Password)
+	if !verify {
+		c.JSON(http.StatusUnauthorized, "We can't log you in")
+		return
+	}
+	
 	ts, err := p.tk.CreateToken(userID)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
@@ -78,11 +89,13 @@ func (p *profileHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, saveErr.Error())
 		return
 	}
-	tokens := map[string]string{
+
+	res := map[string]string{
 		"access_token":  ts.AccessToken,
-		"refresh_token": ts.RefreshToken,
-	}
-	c.JSON(http.StatusOK, tokens)
+		"userID": strconv.FormatInt(userID, 10),
+	}	
+	c.SetCookie("refresh_token", ts.RefreshToken, 60*60*60, "/", setting.AppSetting.PrefixUrl, true, true)
+	c.JSON(http.StatusOK, res)
 }
 
 func (p *profileHandler) Logout(c *gin.Context) {
@@ -98,12 +111,18 @@ func (p *profileHandler) Logout(c *gin.Context) {
 }
 
 func (p *profileHandler) Refresh(c *gin.Context) {
-	mapToken := map[string]string{}
-	if err := c.ShouldBindJSON(&mapToken); err != nil {
+	// mapToken := map[string]string{}
+	// if err := c.ShouldBindJSON(&mapToken); err != nil {
+	// 	c.JSON(http.StatusUnprocessableEntity, err.Error())
+	// 	return
+	// }
+	// refreshToken := mapToken["refresh_token"]
+
+	refreshToken, err := c.Cookie("refresh_token")
+	err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
-	refreshToken := mapToken["refresh_token"]
 
 	//verify the token
 	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
@@ -154,11 +173,12 @@ func (p *profileHandler) Refresh(c *gin.Context) {
 			c.JSON(http.StatusForbidden, saveErr.Error())
 			return
 		}
-		tokens := map[string]string{
+		res := map[string]string{
 			"access_token":  ts.AccessToken,
-			"refresh_token": ts.RefreshToken,
-		}
-		c.JSON(http.StatusCreated, tokens)
+			"userID": strconv.FormatInt(userID, 10),
+		}	
+		c.SetCookie("refresh_token", ts.RefreshToken, 60*60*60, "/", setting.AppSetting.PrefixUrl, true, true)
+		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusUnauthorized, "refresh expired")
 	}
