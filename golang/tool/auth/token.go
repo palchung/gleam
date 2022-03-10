@@ -31,8 +31,8 @@ func (t *tokenservice) CreateToken(userId int64) (*TokenDetails, error) {
 	td.AtExpires = time.Now().Add(time.Minute * 30).Unix() //expires after 30 mins
 	td.TokenUuid = uuid.NewV4().String()
 
-	td.ReExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
-	td.RefreshUuid = td.TokenUuid + "++" + strconv.Itoa(int(userId))
+	td.ReExpires = time.Now().Add(time.Hour * 24 * 7).Unix() // expire after 1 week
+	td.RefreshUuid = uuid.NewV4().String() + "++" + strconv.Itoa(int(userId))
 	
 	var err error 
 	//Create Access Token

@@ -15,16 +15,26 @@ export const AuthProvider = ({ children }) => {
 
     const router = useRouter()
 
-    // useEffect(() => checkedUserLoggedIn(), [])
+    useEffect(() => checkedUserLoggedIn(), [])
+    useEffect(() => getCSRF(), [])
 
-
-    const authHeader = async () => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (!user === null && !accessToken === null) {
-            return { Authorization: 'Bearer ' + accessToken };
+    useEffect(() => {
+        if (!user === null) {
+            console.log("useEffect user : " + accessToken)
+            axios.defaults.headers.common['Authorization'] = 'Bearer ' + accessToken
         } else {
-            return {};
+            axios.defaults.headers.common['Authorization'] = {};
         }
+    }, [user])
+
+
+    const getCSRF = async () => {
+        await axios.get(`${API_URL}/csrf`)
+            .then((response) => {
+                axios.defaults.headers.common['X-CSRF-TOKEN'] = response.data.csrf
+            }, (error) => {
+                console.log(error)
+            })
     }
 
     //Sign Up user
@@ -37,11 +47,12 @@ export const AuthProvider = ({ children }) => {
             password: password
         })
             .then((response) => {
+                console.log("after sign up:" + response.data.access_token)
                 setAccessToken(response.data.access_token)
                 setUser(response.data.userID)
                 router.push('/')
             }, (error) => {
-                console.log(error)
+
                 setError(error)
                 setError(null)
             })
@@ -61,7 +72,7 @@ export const AuthProvider = ({ children }) => {
                 setUser(response.data.userID)
                 router.push('/')
             }, (error) => {
-                console.log(error)
+
                 setError(error)
                 setError(null)
             })
@@ -69,26 +80,53 @@ export const AuthProvider = ({ children }) => {
 
     //Logout
     const logout = async () => {
-        const res = await fetch(`/api/logout`, {
-            method: 'POST',
-        })
 
-        if (res.ok) {
-            setUser(null)
-            router.push('/')
-        }
+        // remove user
+        // remove accessToken
+        // remove axios header
+
+
+        await axios.get(`${API_URL}/login`)
+            .then((response) => {
+                setAccessToken(null)
+                setUser(null)
+            }, (error) => {
+                setError(error)
+                setError(null)
+            })
+
+
+
+
+
+
+        axios.defaults.headers.common['Authorization'] = {};
+
+
+        // const res = await fetch(`/api/logout`, {
+        //     method: 'POST',
+        // })
+
+        // if (res.ok) {
+        //     setUser(null)
+        //     router.push('/')
+        // }
     }
 
     // check user log in
     const checkedUserLoggedIn = async () => {
-        const res = await fetch('/api/user')
-        const data = await res.json()
 
-        if (res.ok) {
-            setUser(data.user)
-        } else {
-            setUser(null)
-        }
+
+        // use refresh token to get access token
+        await axios.get(`${API_URL}/refresh`)
+            .then((response) => {
+                setAccessToken(response.data.access_token)
+                setUser(response.data.userID)
+            }, (error) => {
+                setError(error)
+                setError(null)
+            })
+
     }
 
     return (

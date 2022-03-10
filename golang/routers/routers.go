@@ -4,20 +4,25 @@ import (
 	
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
-	
 	"root/gleam/golang/routers/api/user"
 	"root/gleam/golang/tool/auth"
 	"root/gleam/golang/middleware"
 	"root/gleam/golang/db"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 )
 
 func Setup(rc *redis.Client, db *dbDriver.DB) *gin.Engine {
+
+	store := cookie.NewStore([]byte("secret"))
 
 	// initialize gin
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
-	r.Use(middleware.CORS())
+  	r.Use(sessions.Sessions("csrf", store))
+	r.Use(middleware.CorsProtection())
+	r.Use(middleware.CsrfProtection())
 	
 	// serves static files
 	//r.StaticFS("/route". "../path/to/files")
@@ -31,17 +36,21 @@ func Setup(rc *redis.Client, db *dbDriver.DB) *gin.Engine {
 
 	//test
 	r.POST("/try", service.Try)
-	// r.OPTIONS("/try", service.Try)
+	
+	//CSRF route
+	r.GET("/csrf", service.CSRF)
 
-	// serves public api
+
+	
 	r.POST("/signup", service.Signup)
 	r.POST("/login", service.Login)
 	r.POST("/refresh", service.Refresh)
-	
+	r.POST("/logout", middleware.TokenAuth(), service.Logout)
+
 	u := r.Group("user")
 	u.Use(middleware.TokenAuth())
 	{
-		u.POST("/logout", service.Logout)
+		
 		u.POST("/todo", service.CreateTodo)
 	}
 

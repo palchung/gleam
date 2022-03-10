@@ -3,8 +3,8 @@ package middleware
 import (
 	"net/http"
 	"root/gleam/golang/tool/auth"
-
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/sessions"
 )
 
 //check if the token is still valid
@@ -20,7 +20,7 @@ func TokenAuth() gin.HandlerFunc {
 	}
 }
 
-func CORS() gin.HandlerFunc {
+func CorsProtection() gin.HandlerFunc {
     return func(c *gin.Context) {
         // c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
         c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -30,6 +30,23 @@ func CORS() gin.HandlerFunc {
         if c.Request.Method == "OPTIONS" {
             c.AbortWithStatus(204)
             return
+        }
+        c.Next()
+    }
+}
+
+func CsrfProtection() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        
+		csrfToken := c.Request.Header.Get("X-CSRF-TOKEN")
+		
+		if c.Request.Method != "GET" {
+			session := sessions.Default(c)
+            t := session.Get("csrf")
+			if csrfToken != t {
+				c.JSON(http.StatusUnauthorized, "Unauthorized")
+				return
+			}
         }
         c.Next()
     }

@@ -19,6 +19,7 @@
     "@mui/material": "latest",
     "axios": "^0.26.0",
     "cookie": "^0.4.2",
+    "cookie-cutter": "^0.2.0",
     "next": "latest",
     "node-fetch": "^3.2.1",
     "prop-types": "latest",
