@@ -1,1 +1,1 @@
-This is a app for leaarning purpose.
+This is a app for learning purpose.
